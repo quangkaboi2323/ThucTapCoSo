@@ -14,13 +14,52 @@ typedef struct Egde
 	int x,y;
 }Egde;
 void DocFile(int A[][MaxV], int &V)
-{
-	FILE *f = fopen("input2.txt","rb");
+{	
+	FILE *f = fopen("input1.txt","rb");
 	fscanf(f,"%d",&V);
 	for(int i = 0; i < V; i++)
 		for(int j = 0; j < V; j++)
 			fscanf(f,"%d", &A[i][j]);
 	fclose(f);
+}
+//nhap vao danh sach canh
+int DSC[3][MaxV];
+int canh = 0;
+void NhapDuLieu(int DSC[][MaxV], int &V)
+{
+	printf("Nhap vao so luong dinh: ");
+	scanf("%d",&V);
+	printf("Nhap vao so luong canh: ");
+	scanf("%d",&canh);
+	for(int i = 0; i < canh; i++)
+	{
+		printf("\n-Nhap vao canh %d :",i+1);
+		printf("\n");
+		do{
+			printf("\t+Nhap vao dinh dau: ");
+			scanf("%d",&DSC[0][i]);
+		}while(DSC[0][i] <= 0 || DSC[0][i] > V);
+		do{			
+			printf("\t+Nhap vao dinh cuoi: ");
+			scanf("%d",&DSC[1][i]);
+		}while(DSC[1][i] <= 0 || DSC[1][i] > V);		
+		printf("\tNhap vao trong so cua canh %d: ",i+1);
+		scanf("%d",&DSC[2][i]);
+	}	
+}
+//chuyen danh sach canh thanh Ma Tran Ke
+void Change(int A[][MaxV], int DSC[][MaxV], int V, int canh)
+{
+	//gan cho danh sach Ke bang 0
+	for(int i = 0; i < V; i++)
+		for(int j = 0; j < V; j ++)
+			A[i][j] = 0;
+	//chuyen sang Ma Tran Ke
+	for(int  i = 0; i < canh; i++)
+	{
+		A[DSC[0][i]-1][DSC[1][i]-1] = DSC[2][i];
+		A[DSC[1][i]-1][DSC[0][i]-1] = DSC[2][i];
+	}		
 }
 void XuatMTKe(int A[][MaxV], int V)
 {
@@ -74,6 +113,11 @@ void TaoDiem(int V, int A[][MaxV])
 		B[0][i] = 40 + rand() % 961;
 		B[1][i] = 40 + rand() % 621;			
 	}
+	for(int  i = 0; i < V; i ++)
+	{
+		Circle(B[0][i],B[1][i]);
+		Name(i+1,B[0][i],B[1][i]);
+	}
 	for(int i = 0; i < V; i++)		
 		for(int j = i; j < V; j++)
 			if(A[i][j] != 0)
@@ -82,11 +126,7 @@ void TaoDiem(int V, int A[][MaxV])
 				Name(A[i][j],(B[0][i] + B[0][j]) / 2,(B[1][i] + B[1][j]) / 2);
 				
 			}	
-	for(int  i = 0; i < V; i ++)
-	{
-		Circle(B[0][i],B[1][i]);
-		Name(i+1,B[0][i],B[1][i]);
-	}		
+			
 }
 void Kruskal (int A[][MaxV], int V)
 {
@@ -238,8 +278,7 @@ void VeCayKhung1(int KQ[][MaxV], int V)
 		itoa(TS,out,10);
 		outtextxy(1040,550,"Tong trong so:");
 		outtextxy(1300,550,out);
-			
-		delay(1000);		
+		delay(1000);	
 	}
 	setlinestyle(c, 0, 0); 
 }
@@ -282,8 +321,29 @@ void VeCayKhung2(int KQ[][MaxV], int V)
 
 int main()
 {
-	//Phan thuat toan
-	DocFile(A,V);
+	//phan mo dau chuon trinh
+	printf("\t\t**WELCOME TO KRUSKAL ALGORIHM**\n\n");
+	printf("Cac loai input:\t(press number you want to input!)\n\t1:Nhap tu file\n\t2:Nhap tu ban phim\n");
+	char type;
+	printf("\nNhap vao loai input: ");
+    scanf("%c", &type);
+    switch(type)
+    {
+    	case '1' :
+			DocFile(A,V); break;
+    	case '2' :
+		{
+			NhapDuLieu(DSC,V);
+			Change(A,DSC,V,canh);
+			break;
+		}
+		default: 
+		{
+			printf("Nhap sai loai. Mac dinh se chon loai nhap tu file\n");
+			DocFile(A,V); break;
+		}
+	}
+	//Phan thuat toan	
 	XuatMTKe(A,V);	
 	Kruskal(A,V);
 	
@@ -293,6 +353,7 @@ int main()
 	VeCaculator();
 	TaoDiem(V,A);
 	Input();
+	
 	char key_press;
 	int ascii_value;
 	while(1)
@@ -300,17 +361,17 @@ int main()
 		key_press = getch();
 		ascii_value = key_press;
 		if(ascii_value == 13 ) // ENTER button
-			break;		
+			break;			
 		cleardevice(); 
 		VeMain();
 		VeCaculator();
 		TaoDiem(V,A);	
 		Input();	
-	}
+	}	
 	VeCayKhung1(KQ,V);
 	cleardevice();
 	VeCayKhung2(KQ,V);
 	getch();
-	closegraph();
+	closegraph();	
 	return 1;
 }
